@@ -87,15 +87,15 @@ main()
 	
 	fillScreen_TFT(ST7735_BLACK);
 	
-	affiche_mot(Mesure, 4, 30);
-	affiche_mot(Bpm, 4, 50);
-	affiche_mot(Seuil_bas, 4, 70);
-	affiche_mot(Seuil_haut, 4, 90);
-	affiche_mot(Puis, 4, 110);
+	affiche_mot(Mesure, 28, 5);
+	affiche_mot(Bpm, 1, 40);
+	affiche_mot(Seuil_bas, 1, 70);
+	affiche_mot(Seuil_haut, 1, 100);
+	affiche_mot(Puis, 1, 130);
 	
 	affiche_nombre(sal_bas, 90, 70);
-	affiche_nombre(sal_haut, 90, 90);
-	affiche_nombre(BPM, 90, 50);
+	affiche_nombre(sal_haut, 90, 100);
+	affiche_nombre(BPM, 90, 40);
 	
 	ADC_CR1 |= 1;
 	EnableGeneralInterrupt();
@@ -110,7 +110,7 @@ main()
 		if(ADC_CSR & (1<<7)) {
 			if(old_adc_drh != ADC_DRH) {
 				PUIS = (ADC_DRH * 100) / 255;
-				affiche_nombre(PUIS, 90, 110);
+				affiche_nombre(PUIS, 90, 130);
 				old_adc_drh = ADC_DRH;
 			}
 			ADC_CSR &= ~(1<<7);

@@ -39,7 +39,7 @@ struct interrupt_vector {
 		sal_haut = 240;
 	}
 	
-	affiche_nombre(sal_haut, 90, 90);
+	affiche_nombre(sal_haut, 90, 100);
 	return;
 }
 
