@@ -13,7 +13,7 @@ void init_PWM(void) {
 }
 
 void init_I2C(void) {
-	
+	Init_I2C();
 }
 
 uint16_t read_AD7991(uint8_t octet_conf) {
@@ -27,11 +27,15 @@ uint16_t read_AD7991(uint8_t octet_conf) {
 	Start_I2C();
 	Write_I2C(0b01010001);
 	
-	data = Read_I2C() << 8;
 	Ack_I2C();
-	data |= Read_I2C();
+	data = Read_I2C() << 8;
+	
 	NoAck_I2C();
+	data |= Read_I2C();
+	
 	Stop_I2C();
+	
+	return data;
 }
 
 void init_UART2(void) {
