@@ -75,3 +75,52 @@ void init_LED(void) {
   PB_CR1|=7;
 	PB_CR2|=7;
 }
+
+void init_timer1_2ms(void) {
+		CLK_PCKENR1 |= 1 << 7;
+		TIM1_PSCRH = 1 / 256;
+		TIM1_PSCRL = 1 % 256;
+		TIM1_ARRH = 15999/ 256;		TIM1_ARRL = 15999% 256;
+		TIM1_CR1 = 0;
+		TIM1_IER |= 1;
+		TIM1_SR1 = 0;
+		TIM1_CR1 |= 1;
+}
+
+void init_UART2(uint16_t UART_BAUDRATE) {
+	uint16_t uart = 16000000/UART_BAUDRATE;
+	
+	UART2_BRR2 = 0xF0 & (uart >> 4) + 0xF & uart; // BRR2 first
+	UART2_BRR1 = 0xF & (uart >> 4);
+	
+	UART2_CR2 = 0x08; // TEN bit(3) to allow transmitting
+	
+	UART2_CR1 = 0b00000000; // M bit 0 for 8 bit word length
+	UART2_CR3 = 0b00000000; // STOP bit 00 (4,5) for 1 stop bit
+	
+	//page 329 instruction
+}
+
+void write_byte_UART2(uint8_t data) {
+	UART2_DR = data;
+	while( !(UART2_SR & (1<<7)) );
+}
+
+void init_timer2_pwm(void) {
+	CLK_PCKENR1 |= 1 << 5;
+	
+	TIM2_PSCR = 4;
+	TIM2_ARRH = 0;
+	TIM2_ARRL = 99;
+	TIM2_CCR1H = 0;
+	TIM2_CCR1L = 50;
+	
+	TIM2_CCMR1 = 0x68;
+	TIM2_CCER1 &= ~(1<<1);
+	TIM2_CCER1 |= 1 << 0;
+	TIM2_CR1 = 0x81;
+	
+	PD_DDR |= 1 << 4;
+	PD_CR1 |= 1 << 4;
+	PD_CR2 &= ~(1 << 4);
+}

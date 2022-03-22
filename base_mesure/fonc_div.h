@@ -14,9 +14,10 @@ void init_LED(void);
 
 //control_2
 
-
-
-
+void init_timer1_2ms(void);
+void init_UART2(uint16_t UART_BAUDRATE);
+void write_byte_UART2(uint8_t data);
+void init_timer2_pwm(void);
 
 //control_3
 

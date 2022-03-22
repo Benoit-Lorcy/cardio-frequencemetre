@@ -41,25 +41,6 @@ uint16_t read_AD7991(uint8_t octet_conf) {
 	return data;
 }
 
-void init_UART2(void) {
-	uint16_t uart = 277;
-	
-	UART2_BRR2 = 0xF0 & (uart >> 4) + 0xF & uart; // BRR2 first
-	UART2_BRR1 = 0xF & (uart >> 4);
-	
-	UART2_CR2 = 0x08; // TEN bit(3) to allow transmitting
-	
-	UART2_CR1 = 0b00000000; // M bit 0 for 8 bit word length
-	UART2_CR3 = 0b00000000; // STOP bit 00 (4,5) for 1 stop bit
-	
-	//page 329 instruction
-}
-
-void write_byte_UART2(uint8_t data) {
-	UART2_DR = data;
-	while( !(UART2_SR & (1<<7)) );
-}
-
 void send_ac_cap_UART(uint16_t cap) {
 	write_byte_UART2((cap >> 8) & 0x0F);
 	write_byte_UART2(((cap >> 4) & 0x0F) | 0x10);
@@ -75,6 +56,7 @@ void send_dc_cap_UART(uint16_t cap) {
 main()
 {
 	uint8_t old_adc_drh = 0;
+	uint16_t calc_ccr = 0;
 	
 	CLK_CKDIVR = 0;
 	BPM = 50;
@@ -84,6 +66,10 @@ main()
 	init_Poussoirs();
 	init_LED();
 	init_ADC();
+	
+	init_timer1_2ms();
+	init_timer2_pwm();
+	init_UART2(57600);
 	
 	fillScreen_TFT(ST7735_BLACK);
 	
@@ -112,9 +98,18 @@ main()
 				PUIS = (ADC_DRH * 100) / 255;
 				affiche_nombre(PUIS, 90, 130);
 				old_adc_drh = ADC_DRH;
+				
+				TIM2_CCR1H = PUIS / 256;
+				TIM2_CCR1L = PUIS % 256;
 			}
 			ADC_CSR &= ~(1<<7);
 			ADC_CR1 |= 1;
+		}
+		
+		if(int_2ms_ok == 1) {
+			int_2ms_ok = 0;
+			send_ac_cap_UART(2000);
+			send_dc_cap_UART(1000);
 		}
 	}
 }
