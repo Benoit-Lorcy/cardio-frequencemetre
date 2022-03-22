@@ -55,7 +55,7 @@ void init_UART2(void) {
 
 void write_byte_UART2(uint8_t data) {
 	UART2_DR = data;
-	while( !(UART2_SR & (1<<6)) );
+	while( !(UART2_SR & (1<<7)) );
 }
 
 void send_ac_cap_UART(uint16_t cap) {
