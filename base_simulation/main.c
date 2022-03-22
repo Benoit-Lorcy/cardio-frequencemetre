@@ -22,7 +22,9 @@ void init_I2C(void) {
 
 main()
 {
-	init_ADC();
+	init_SPI();
+	affiche_mot("test", 0, 0);
+	affiche_mot("test", 0, 12);
 	// enableInterrupts
 	
 	while (1);
