@@ -1,0 +1,11 @@
+projet.stw
+projet.wdb
+projet.wed
+base_mesure/Debug
+base_mesure/Release
+base_mesure/base_mesure.dep
+base_mesure/base_mesure.stp
+base_simulation/Debug
+base_simulation/Release
+base_simulation/base_simulation.dep
+base_simulation/base_simulation.stp
