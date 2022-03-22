@@ -11,6 +11,6 @@ Dependencies=
 Filename=base_simulation\base_simulation.stp
 Dependencies=
 [Options]
-ActiveProject=base_mesure
+ActiveProject=base_simulation
 ActiveConfig=Debug
 AddSortedElements=0

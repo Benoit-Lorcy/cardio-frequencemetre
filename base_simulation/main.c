@@ -5,8 +5,9 @@
  
  // SIMULATION
  
-#include <iostm8s105.h>
-
+//#include <iostm8s105.h>
+#include "fonc_div.h"
+/*
 // Init PWM connection for PUIS
 void init_pwm(void) {
 	
@@ -16,12 +17,14 @@ void init_pwm(void) {
 void init_I2C(void) {
 	
 }
+*/
+
 
 main()
 {
-	init_pwm();
-	init_I2C();
-	
+	init_SPI();
+	affiche_mot("test", 0, 0);
+	affiche_mot("test", 0, 12);
 	// enableInterrupts
 	
 	while (1);
