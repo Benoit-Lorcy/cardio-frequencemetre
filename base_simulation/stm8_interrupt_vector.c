@@ -3,6 +3,11 @@
  */
 #include <iostm8s105.h>
 
+extern volatile uint8_t k;
+extern volatile uint8_t mod_BPM;
+extern volatile uint8_t mod_MODE;
+
+
 typedef void @far (*interrupt_handler_t)(void);
 
 struct interrupt_vector {
@@ -18,6 +23,17 @@ struct interrupt_vector {
 	return;
 }
 
+@far @interrupt void int_PE5(void){
+	mod_BPM=1;
+	k=(k&7)+1;
+	return;
+}
+
+@far @interrupt void int_PC4(void){
+	mod_MODE=1;
+	return;
+}
+
 extern void _stext();     /* startup routine */
 
 struct interrupt_vector const _vectab[] = {
@@ -28,9 +44,9 @@ struct interrupt_vector const _vectab[] = {
 	{0x82, NonHandledInterrupt}, /* irq2  */
 	{0x82, NonHandledInterrupt}, /* irq3  */
 	{0x82, NonHandledInterrupt}, /* irq4  */
-	{0x82, NonHandledInterrupt}, /* irq5  */
+	{0x82, int_PC4}, /* irq5  */
 	{0x82, NonHandledInterrupt}, /* irq6  */
-	{0x82, NonHandledInterrupt}, /* irq7  */
+	{0x82, int_PE5}, /* irq7  */
 	{0x82, NonHandledInterrupt}, /* irq8  */
 	{0x82, NonHandledInterrupt}, /* irq9  */
 	{0x82, NonHandledInterrupt}, /* irq10 */

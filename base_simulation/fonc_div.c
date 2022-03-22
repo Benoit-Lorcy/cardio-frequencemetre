@@ -39,13 +39,43 @@ void affiche_nombre(uint16_t nombre, uint8_t col, uint8_t ligne) {
 }
 
 void init_ADC(void) {
+	CLK_PCKENR2 |= (1<<3);
 	
+	PF_DDR &= ~(1 << 4);
+	PF_CR1 &= ~(1 << 4);
+	PF_CR2 &= ~(1 << 4);
+	
+	ADC_CSR = 0x0C;
+	ADC_CR1 = 0x01;
+	ADC_CR2 = 0x00;
 }
 
 uint8_t read_ADC_8b(void) {
+	uint8_t temps;
+	ADC_CR1 |= 1;
 	
+	while((ADC_CSR & (1<<7)) == 0);
+	temps = ADC_DRH;
+	ADC_CSR &= ~(1<<7);
+		
+	return temps;
 }
 
 void init_Poussoirs(void){
+	PE_DDR &= ~(1 << 5);
+	PE_CR1 &= ~(1 << 5);
+	PE_CR2 |= (1 << 5);
 	
+		
+	PC_DDR &= ~(1 << 4);
+	PC_CR1 &= ~(1 << 4);
+	PC_CR2 |= (1 << 4);
+	
+	EXTI_CR1 |= (1<<5);
+	EXTI_CR1 &=~ (1 << 4);
+	
+	//EXTI_CR2 &= ~1;
+	//EXTI_CR2 |= 2;
+	EXTI_CR2 |= 1<<1;
+	EXTI_CR2 &= ~(1<<0);
 }
