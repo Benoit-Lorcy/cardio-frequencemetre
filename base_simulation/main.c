@@ -7,6 +7,7 @@
  
 //#include <iostm8s105.h>
 #include "fonc_div.h"
+#include "defs.h"
 /*
 // Init PWM connection for PUIS
 void init_pwm(void) {
@@ -18,14 +19,21 @@ void init_I2C(void) {
 	
 }
 */
-
+#define PUIS=40
+#define BPM=30
+#define MODE=0
+#define CLK_CKDIVR=
 
 main()
 {
+	EnableGeneralInterrupt();
 	init_SPI();
-	affiche_mot("test", 0, 0);
-	affiche_mot("test", 0, 12);
-	// enableInterrupts
+	init_TFT();
+	init_Poussoirs();
+	affiche_mot("TEST", 0, 0);
+	affiche_mot("TETS", 0, 20);
+	
+	affiche_nombre(999, 0 ,40);
 	
 	while (1);
 }

@@ -29,14 +29,14 @@ void affiche_mot(uint8_t* mot, uint8_t col, uint8_t ligne) {
 		mot++;
 	}
 }
-/*
-void affiche_nombre(uint16_t nombre, uint8_t col, uint_t ligne) {
+
+void affiche_nombre(uint16_t nombre, uint8_t col, uint8_t ligne) {
 	if(nombre < 1000) {
-		displayChar_TFT(col, ligne, '0'+(nombre/100), ST7735_YELLOW, ST7735_BLACK, 1);
-		displayChar_TFT(col+11, ligne, '0'+((nombre%100)/10), ST7735_YELLOW, ST7735_BLACK, 1);
-		displayChar_TFT(col+11*2, ligne, '0'+(nombre%10), ST7735_YELLOW, ST7735_BLACK, 1);
+		displayChar_TFT(col, ligne, '0'+(nombre/100), ST7735_YELLOW, ST7735_BLACK, 2);
+		displayChar_TFT(col+11, ligne, '0'+((nombre%100)/10), ST7735_YELLOW, ST7735_BLACK, 2);
+		displayChar_TFT(col+11*2, ligne, '0'+(nombre%10), ST7735_YELLOW, ST7735_BLACK, 2);
 	}
-}*/
+}
 
 void init_ADC(void) {
 	
