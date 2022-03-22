@@ -7,6 +7,7 @@
  
 #include <iostm8s105.h>
 #include "fonc_I2C.h"
+#include "fonc_delay.h"
 
 void init_PWM(void) {
 	
