@@ -22,8 +22,9 @@ static const uint8_t Fond[]="Fond:";
 static const uint8_t Valeurs[]="Valeurs:";
 
 //divers
-volatile uint8_t sal_bas = 0;
-volatile uint8_t sal_haut = 0;
-volatile uint8_t BPM = 20;
+volatile uint8_t sal_bas = 40;
+volatile uint8_t sal_haut = 240;
+volatile uint8_t BPM = 70;
+volatile uint8_t PUIS = 30;
 
 #endif

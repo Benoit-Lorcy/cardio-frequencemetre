@@ -5,8 +5,6 @@
 
 #include "fonc_div.h"
 
-#include "fonc_tft.h"
-
 void init_SPI(void) {
 	CLK_PCKENR1 |= 1 << 1;
 		
@@ -32,7 +30,7 @@ void affiche_mot(uint8_t* mot, uint8_t col, uint8_t ligne) {
 	}
 }
 
-void affiche_nombre(unsigned short nombre, uint8_t col, uint8_t ligne) {
+void affiche_nombre(uint16_t nombre, uint8_t col, uint8_t ligne) {
 	if(nombre < 1000) {
 		displayChar_TFT(col, ligne, '0'+(nombre/100), ST7735_YELLOW, ST7735_BLACK, 2);
 		displayChar_TFT(col+11, ligne, '0'+((nombre%100)/10), ST7735_YELLOW, ST7735_BLACK, 2);
@@ -52,7 +50,7 @@ void init_ADC(void) {
 	ADC_CR2 = 0x00;
 }
 
-void init_Poussoirs() {
+void init_Poussoirs(void) {
 	PE_DDR &= ~(1 << 5);
 	PE_CR1 &= ~(1 << 5);
 	PE_CR2 |= (1 << 5);

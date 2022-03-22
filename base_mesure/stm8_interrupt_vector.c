@@ -27,7 +27,8 @@ struct interrupt_vector {
 	if(sal_bas > 60) {
 		sal_bas = 40;
 	}
-	affiche_nombre(sal_bas, 4,4);
+	
+	affiche_nombre(sal_bas, 90, 70);
 	return;
 }
 
@@ -37,7 +38,8 @@ struct interrupt_vector {
 	if(sal_haut < 100) {
 		sal_haut = 240;
 	}
-	affiche_nombre(sal_haut, 4,4);
+	
+	affiche_nombre(sal_haut, 90, 90);
 	return;
 }
 
@@ -52,8 +54,8 @@ struct interrupt_vector const _vectab[] = {
 	{0x82, NonHandledInterrupt}, /* irq3  */
 	{0x82, NonHandledInterrupt}, /* irq4  */
 	{0x82, NonHandledInterrupt}, /* irq5  */
-	{0x82, NonHandledInterrupt}, /* irq6  */
-	{0x82, NonHandledInterrupt}, /* irq7  */
+	{0x82, int_PD3}, /* irq6  */
+	{0x82, int_PE5}, /* irq7  */
 	{0x82, NonHandledInterrupt}, /* irq8  */
 	{0x82, NonHandledInterrupt}, /* irq9  */
 	{0x82, NonHandledInterrupt}, /* irq10 */

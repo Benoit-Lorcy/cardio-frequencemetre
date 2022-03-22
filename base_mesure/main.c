@@ -74,23 +74,47 @@ void send_dc_cap_UART(uint16_t cap) {
 
 main()
 {
+	uint8_t old_adc_drh = 0;
+	
 	CLK_CKDIVR = 0;
 	BPM = 50;
 	
 	init_SPI();
 	init_TFT();
 	init_Poussoirs();
+	init_LED();
+	init_ADC();
 	
-	init_PWM();
-	init_I2C();
-	init_UART2();
+	fillScreen_TFT(ST7735_BLACK);
 	
-	init_spi_port_display();
+	affiche_mot(Mesure, 4, 30);
+	affiche_mot(Bpm, 4, 50);
+	affiche_mot(Seuil_bas, 4, 70);
+	affiche_mot(Seuil_haut, 4, 90);
+	affiche_mot(Puis, 4, 110);
 	
-	affiche_mot("Mon beau mot", 4, 4);
-	affiche_nombre(345, 12, 12);
+	affiche_nombre(sal_bas, 90, 70);
+	affiche_nombre(sal_haut, 90, 90);
+	affiche_nombre(BPM, 90, 50);
 	
-	// enableInterrupts
+	ADC_CR1 |= 1;
+	EnableGeneralInterrupt();
 	
-	while (1);
+	while (1) {
+		if (BPM <= sal_bas || BPM >= sal_haut) {
+			PB_ODR |= 2;
+		} else {
+			PB_ODR &= ~2;
+		}
+		
+		if(ADC_CSR & (1<<7)) {
+			if(old_adc_drh != ADC_DRH) {
+				PUIS = (ADC_DRH * 100) / 255;
+				affiche_nombre(PUIS, 90, 110);
+				old_adc_drh = ADC_DRH;
+			}
+			ADC_CSR &= ~(1<<7);
+			ADC_CR1 |= 1;
+		}
+	}
 }
