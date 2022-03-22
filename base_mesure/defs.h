@@ -16,15 +16,14 @@ static const uint8_t Demo[]="MODE DEMO";
 static const uint8_t Ops[]="MODE OPS "; 
 
 
-
-
 // ecran choix couleur, carte controle
 static const uint8_t Texte[]="Texte:";
 static const uint8_t Fond[]="Fond:";
 static const uint8_t Valeurs[]="Valeurs:";
 
 //divers
-
-
+volatile uint8_t sal_bas = 0;
+volatile uint8_t sal_haut = 0;
+volatile uint8_t BPM = 20;
 
 #endif

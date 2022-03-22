@@ -1,7 +1,6 @@
 /*	IO DEFINITIONS FOR STM8 S105 covers C, K and S families
  *	Copyright (c) 2010 by COSMIC Software
  */
-
 typedef signed char int8_t;
 typedef signed short int16_t;
 typedef signed long int32_t;

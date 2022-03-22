@@ -5,16 +5,18 @@
  
 // MESURE
  
-#include <iostm8s105.h>
+#include "fonc_div.h"
+#include "defs.h"
 #include "fonc_I2C.h"
 #include "fonc_delay.h"
+
 
 void init_PWM(void) {
 	
 }
 
 void init_I2C(void) {
-	Init_I2C();
+	//Init_I2C();
 }
 
 uint16_t read_AD7991(uint8_t octet_conf) {
@@ -45,7 +47,7 @@ void init_UART2(void) {
 	UART2_BRR2 = 0xF0 & (uart >> 4) + 0xF & uart; // BRR2 first
 	UART2_BRR1 = 0xF & (uart >> 4);
 	
-	UART_CR2 = 0x08; // TEN bit(3) to allow transmitting
+	UART2_CR2 = 0x08; // TEN bit(3) to allow transmitting
 	
 	UART2_CR1 = 0b00000000; // M bit 0 for 8 bit word length
 	UART2_CR3 = 0b00000000; // STOP bit 00 (4,5) for 1 stop bit
@@ -72,9 +74,21 @@ void send_dc_cap_UART(uint16_t cap) {
 
 main()
 {
+	CLK_CKDIVR = 0;
+	BPM = 50;
+	
+	init_SPI();
+	init_TFT();
+	init_Poussoirs();
+	
 	init_PWM();
 	init_I2C();
 	init_UART2();
+	
+	init_spi_port_display();
+	
+	affiche_mot("Mon beau mot", 4, 4);
+	affiche_nombre(345, 12, 12);
 	
 	// enableInterrupts
 	

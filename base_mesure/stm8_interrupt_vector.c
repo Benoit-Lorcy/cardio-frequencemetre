@@ -1,7 +1,10 @@
 /*	BASIC INTERRUPT VECTOR TABLE FOR STM8 devices
  *	Copyright (c) 2007 STMicroelectronics
  */
-#include <iostm8s105.h>
+#include "fonc_div.h"
+
+extern volatile uint8_t sal_bas;
+extern volatile uint8_t sal_haut;
 
 typedef void @far (*interrupt_handler_t)(void);
 
@@ -15,6 +18,26 @@ struct interrupt_vector {
 	/* in order to detect unexpected events during development, 
 	   it is recommended to set a breakpoint on the following instruction
 	*/
+	return;
+}
+
+@far @interrupt void int_PE5(void)
+{
+	sal_bas += 2;
+	if(sal_bas > 60) {
+		sal_bas = 40;
+	}
+	affiche_nombre(sal_bas, 4,4);
+	return;
+}
+
+@far @interrupt void int_PD3 (void)
+{
+	sal_haut -= 10;
+	if(sal_haut < 100) {
+		sal_haut = 240;
+	}
+	affiche_nombre(sal_haut, 4,4);
 	return;
 }
 
