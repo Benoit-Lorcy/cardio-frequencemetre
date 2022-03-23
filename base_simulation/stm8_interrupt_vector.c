@@ -6,8 +6,7 @@
 extern volatile uint8_t k;
 extern volatile uint8_t mod_BPM;
 extern volatile uint8_t mod_MODE;
-
-extern volatile uint8_t timer3_count;
+extern volatile uint16_t PUIS;
 
 
 typedef void @far (*interrupt_handler_t)(void);
@@ -37,8 +36,9 @@ struct interrupt_vector {
 }
 
 @far @interrupt void int_PD4(void){
-	timer3_count = TIM3_CNTRH <<8;
-	timer3_count |= TIM3_CNTRL
+	if(!(PD_IDR & (1<<4))) PUIS	= ((TIM3_CNTRH << 8) + TIM3_CNTRL + 8)/16;
+	TIM3_CNTRH = 0;
+	TIM3_CNTRL = 0;
 }
 
 extern void _stext();     /* startup routine */

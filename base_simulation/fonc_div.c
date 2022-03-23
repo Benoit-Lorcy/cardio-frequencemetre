@@ -90,15 +90,16 @@ void init_PD4(void){
 }
 
 void init_timer3(void){
-	uint8_t arr = 1599;
+	uint16_t arr = 1600;
 	CLK_PCKENR1 |= 1 << 6;
 	
-	TIM2_PSCR &= ~0xFF;
+	TIM3_PSCR = 0;
 	TIM3_ARRH = arr / 256;
 	TIM3_ARRL = arr % 256;
 	
-	TIM3_CCMR1 = 0x68;
-	TIM3_CCER1 &= ~(11);
-	TIM3_CCER1 |= 1;
+	//TIM3_CCMR1 = 0x68;
+	//TIM3_CCER1 &= ~(11);
+	//TIM3_CCER1 |= 1;
 	TIM3_CR1 = 0x81;
+	TIM3_SR1 &= ~1;
 }

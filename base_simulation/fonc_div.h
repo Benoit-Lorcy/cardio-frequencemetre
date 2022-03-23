@@ -10,6 +10,8 @@ void affiche_nombre(uint16_t nombre, uint8_t col, uint8_t ligne);
 void init_ADC(void);
 uint8_t read_ADC_8b(void);
 void init_Poussoirs(void);
+void init_PD4(void);
+void init_timer3(void);
 
 //simu_2
 

@@ -24,11 +24,12 @@ static const uint8_t Fond[]="Fond:";
 static const uint8_t Valeurs[]="Valeurs:";
 
 //divers
-uint8_t PUIS = 40;
-uint8_t BPM = 30;
-uint8_t MODE = 0;
+volatile uint16_t PUIS = 40;
+volatile uint8_t BPM = 30;
+volatile uint8_t MODE = 0;
 
 volatile uint8_t k = 1;
+volatile uint16_t update_PUIS = 0;
 volatile uint8_t mod_BPM = 0;
 volatile uint8_t mod_MODE = 0;
 
