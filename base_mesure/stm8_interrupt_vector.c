@@ -5,7 +5,7 @@
 
 extern volatile uint8_t sal_bas;
 extern volatile uint8_t sal_haut;
-extern volatile uint8_t int_2ms_ok;
+extern volatile uint16_t int_2ms_ok;
 
 typedef void @far (*interrupt_handler_t)(void);
 

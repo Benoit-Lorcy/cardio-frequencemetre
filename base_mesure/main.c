@@ -58,7 +58,7 @@ main()
 	uint8_t old_adc_drh = 0;
 	uint16_t calc_ccr = 0;
 	
-	CLK_CKDIVR = 0;
+	CLK_CKDIVR &= 0b11100000;
 	BPM = 50;
 	
 	init_SPI();

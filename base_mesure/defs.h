@@ -26,6 +26,6 @@ volatile uint8_t sal_bas = 40;
 volatile uint8_t sal_haut = 240;
 volatile uint8_t BPM = 70;
 volatile uint8_t PUIS = 30;
-volatile uint8_t int_2ms_ok = 0;
+volatile uint16_t int_2ms_ok = 0;
 
 #endif
