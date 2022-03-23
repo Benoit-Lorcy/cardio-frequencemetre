@@ -5,6 +5,15 @@
 
 #include "fonc_div.h"
 
+extern volatile uint16_t cpt_ech;
+extern volatile uint16_t tab_cpt[8];
+
+extern volatile uint16_t ac_cap;
+extern volatile uint16_t dc_cap;
+extern volatile uint8_t etat;
+extern volatile uint8_t led_poul_counter;
+extern volatile uint8_t BPM;
+
 void init_SPI(void) {
 	CLK_PCKENR1 |= 1 << 1;
 		
@@ -126,4 +135,46 @@ void init_timer2_pwm(void) {
 	PD_DDR |= 1 << 4;
 	PD_CR1 |= 1 << 4;
 	PD_CR2 &= ~(1 << 4);
+}
+
+void machine_etat(void) {
+	uint16_t cmpt_moyenne = 0;
+	switch(etat) {
+		case 1:
+			if(ac_cap > 2148) {
+				etat = 2;
+			}
+			break;
+		case 2:
+			if(ac_cap < 1948) {
+				etat = 3;
+				cpt_ech = 0;
+			}
+			break;
+		case 3:
+			if(ac_cap > 2148) {
+				etat = 4;
+				PB_ODR |= 1;
+				led_poul_counter = 49;
+			}
+			break;
+		case 4:
+			if(ac_cap < 1948) {
+				etat=3;
+				cmpt_moyenne = (cpt_ech + tab_cpt[0] + tab_cpt[1] + tab_cpt[2] + tab_cpt[3] + tab_cpt[4] + tab_cpt[5] + tab_cpt[6] + tab_cpt[7]) / 9;
+				tab_cpt[7] = tab_cpt[6];
+				tab_cpt[6] = tab_cpt[5];
+				tab_cpt[5] = tab_cpt[4];
+				tab_cpt[4] = tab_cpt[3];
+				tab_cpt[3] = tab_cpt[2];
+				tab_cpt[2] = tab_cpt[1];
+				tab_cpt[1] = tab_cpt[0];
+				
+				tab_cpt[0] = cpt_ech;
+				cpt_ech = 0;
+				BPM = (60 * 1000) / (cmpt_moyenne * 2);
+			}
+			break;
+		default: etat = 1;
+	}
 }
