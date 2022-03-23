@@ -79,3 +79,26 @@ void init_Poussoirs(void){
 	EXTI_CR2 |= 1<<1;
 	EXTI_CR2 &= ~(1<<0);
 }
+
+void init_PD4(void){
+	PD_DDR &= ~(1 << 4);
+	PD_CR1 &= ~(1 << 4);
+	PD_CR2 |= (1 << 4);
+	
+	EXTI_CR1 |= (1<<7);
+	EXTI_CR1 |= (1<<6);
+}
+
+void init_timer3(void){
+	uint8_t arr = 1599;
+	CLK_PCKENR1 |= 1 << 6;
+	
+	TIM2_PSCR &= ~0xFF;
+	TIM3_ARRH = arr / 256;
+	TIM3_ARRL = arr % 256;
+	
+	TIM3_CCMR1 = 0x68;
+	TIM3_CCER1 &= ~(11);
+	TIM3_CCER1 |= 1;
+	TIM3_CR1 = 0x81;
+}

@@ -7,6 +7,8 @@ extern volatile uint8_t k;
 extern volatile uint8_t mod_BPM;
 extern volatile uint8_t mod_MODE;
 
+extern volatile uint8_t timer3_count;
+
 
 typedef void @far (*interrupt_handler_t)(void);
 
@@ -34,6 +36,11 @@ struct interrupt_vector {
 	return;
 }
 
+@far @interrupt void int_PD4(void){
+	timer3_count = TIM3_CNTRH <<8;
+	timer3_count |= TIM3_CNTRL
+}
+
 extern void _stext();     /* startup routine */
 
 struct interrupt_vector const _vectab[] = {
@@ -45,7 +52,7 @@ struct interrupt_vector const _vectab[] = {
 	{0x82, NonHandledInterrupt}, /* irq3  */
 	{0x82, NonHandledInterrupt}, /* irq4  */
 	{0x82, int_PC4}, /* irq5  */
-	{0x82, NonHandledInterrupt}, /* irq6  */
+	{0x82, int_PD4}, /* irq6  */
 	{0x82, int_PE5}, /* irq7  */
 	{0x82, NonHandledInterrupt}, /* irq8  */
 	{0x82, NonHandledInterrupt}, /* irq9  */

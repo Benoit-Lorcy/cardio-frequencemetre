@@ -9,14 +9,6 @@
 #include "fonc_div.h"
 #include "defs.h"
 
-uint8_t PUIS = 40;
-uint8_t BPM = 30;
-uint8_t MODE = 0;
-
-volatile uint8_t k = 1;
-volatile uint8_t mod_BPM = 0;
-volatile uint8_t mod_MODE = 0;
-
 /*
 // Init PWM connection for PUIS
 void init_pwm(void) {
@@ -30,10 +22,14 @@ void init_I2C(void) {
 */
 main()
 {
+	uint8_t i = 0;
+	uint16_t ac_cap = 0;
+	uint16_t dc_cap = 0;
+	
 	PUIS=40;
 	BPM=30;
 	MODE=0;
-	CLK_CKDIVR=0;
+	CLK_CKDIVR&=0b11100000;
 	
 	
 	init_SPI();
@@ -50,6 +46,7 @@ main()
 	affiche_nombre(PUIS, 90, 45);
 	EnableGeneralInterrupt();
 	
+	
 	for(;;){
 		if(mod_BPM){
 			mod_BPM=0;
@@ -57,16 +54,25 @@ main()
 			affiche_nombre(BPM, 90, 25);
 		}
 		if(mod_MODE){
-			mod_MODE = 0;
+			mod_MODE = 0; 
 			MODE = MODE ^ 1;
 			if(!MODE){
 				affiche_mot(Demo,10,65);
+
 			}
 			else
 			{
 				affiche_mot(Ops,10,65);
+				fillRect_TFT(0, 80, 128, 80, ST7735_BLACK);
 			}
 		}
+		if(!MODE){
+			ac_cap = (tab_ech[(k*i*4)%1000]<<(PUIS>>4)>>3)/32;
+			drawVLine_TFT(i, 120-40, 80, ST7735_BLACK);
+			drawVLine_TFT(i, 120 - ac_cap, 5, ST7735_YELLOW);
+			i = (i+1)%128;
+		}
+		
 		PUIS = (read_ADC_8b()*100)/255;
 		affiche_nombre(PUIS,90,45);
 		
