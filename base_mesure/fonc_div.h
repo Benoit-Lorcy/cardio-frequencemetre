@@ -22,7 +22,7 @@ void init_timer2_pwm(void);
 //control_3
 
 
-
+void machine_etat(void);
 
 //control_f
 

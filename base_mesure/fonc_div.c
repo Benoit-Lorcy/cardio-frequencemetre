@@ -5,6 +5,15 @@
 
 #include "fonc_div.h"
 
+extern volatile uint16_t cpt_ech;
+extern volatile uint16_t tab_cpt[8];
+
+extern volatile uint16_t ac_cap;
+extern volatile uint16_t dc_cap;
+extern volatile uint8_t etat;
+extern volatile uint8_t led_poul_counter;
+extern volatile uint8_t BPM;
+
 void init_SPI(void) {
 	CLK_PCKENR1 |= 1 << 1;
 		
@@ -80,7 +89,8 @@ void init_timer1_2ms(void) {
 		CLK_PCKENR1 |= 1 << 7;
 		TIM1_PSCRH = 1 / 256;
 		TIM1_PSCRL = 1 % 256;
-		TIM1_ARRH = 15999/ 256;		TIM1_ARRL = 15999% 256;
+		TIM1_ARRH = 15999 / 256;
+		TIM1_ARRL = 15999 % 256;
 		TIM1_CR1 = 0;
 		TIM1_IER |= 1;
 		TIM1_SR1 = 0;
@@ -88,15 +98,17 @@ void init_timer1_2ms(void) {
 }
 
 void init_UART2(uint16_t UART_BAUDRATE) {
+	
 	uint16_t uart = 16000000/UART_BAUDRATE;
 	
-	UART2_BRR2 = 0xF0 & (uart >> 4) + 0xF & uart; // BRR2 first
-	UART2_BRR1 = 0xF & (uart >> 4);
+	CLK_PCKENR1 |= 1 << 3;
 	
-	UART2_CR2 = 0x08; // TEN bit(3) to allow transmitting
+	UART2_BRR2 = (0xF0 & (uart >> 8)) | (0x0F & uart); // BRR2 first
+	UART2_BRR1 = 0xFF & (uart >> 4);
 	
 	UART2_CR1 = 0b00000000; // M bit 0 for 8 bit word length
-	UART2_CR3 = 0b00000000; // STOP bit 00 (4,5) for 1 stop bit
+	UART2_CR2 = 0b00001100; // TEN bit(3) to allow transmitting
+	UART2_CR3 &= 0b10000000; // STOP bit 00 (4,5) for 1 stop bit
 	
 	//page 329 instruction
 }
@@ -123,4 +135,46 @@ void init_timer2_pwm(void) {
 	PD_DDR |= 1 << 4;
 	PD_CR1 |= 1 << 4;
 	PD_CR2 &= ~(1 << 4);
+}
+
+void machine_etat(void) {
+	uint16_t cmpt_moyenne = 0;
+	switch(etat) {
+		case 1:
+			if(ac_cap > 2148) {
+				etat = 2;
+			}
+			break;
+		case 2:
+			if(ac_cap < 1948) {
+				etat = 3;
+				cpt_ech = 0;
+			}
+			break;
+		case 3:
+			if(ac_cap > 2148) {
+				etat = 4;
+				PB_ODR |= 1;
+				led_poul_counter = 49;
+			}
+			break;
+		case 4:
+			if(ac_cap < 1948) {
+				etat=3;
+				cmpt_moyenne = (cpt_ech + tab_cpt[0] + tab_cpt[1] + tab_cpt[2] + tab_cpt[3] + tab_cpt[4] + tab_cpt[5] + tab_cpt[6] + tab_cpt[7]) / 9;
+				tab_cpt[7] = tab_cpt[6];
+				tab_cpt[6] = tab_cpt[5];
+				tab_cpt[5] = tab_cpt[4];
+				tab_cpt[4] = tab_cpt[3];
+				tab_cpt[3] = tab_cpt[2];
+				tab_cpt[2] = tab_cpt[1];
+				tab_cpt[1] = tab_cpt[0];
+				
+				tab_cpt[0] = cpt_ech;
+				cpt_ech = 0;
+				BPM = (60 * 1000) / (cmpt_moyenne * 2);
+			}
+			break;
+		default: etat = 1;
+	}
 }

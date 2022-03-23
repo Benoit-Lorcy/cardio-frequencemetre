@@ -58,7 +58,7 @@ main()
 	uint8_t old_adc_drh = 0;
 	uint16_t calc_ccr = 0;
 	
-	CLK_CKDIVR = 0;
+	CLK_CKDIVR &= 0b11100000;
 	BPM = 50;
 	
 	init_SPI();
@@ -108,6 +108,15 @@ main()
 		
 		if(int_2ms_ok == 1) {
 			int_2ms_ok = 0;
+			cpt_ech++;
+			ech = (ech + k) % 1000;
+			
+			ac_cap = 2048 + tab_ech[ech];
+			
+			machine_etat();
+			
+			affiche_nombre(BPM, 90, 40);
+			
 			send_ac_cap_UART(2000);
 			send_dc_cap_UART(1000);
 		}
