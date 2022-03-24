@@ -103,3 +103,22 @@ void init_timer3(void){
 	TIM3_CR1 = 0x81;
 	TIM3_SR1 &= ~1;
 }
+
+void init_I2C_Slave(void) {
+	I2C_FREQR = (I2C_FREQR & 0b11000000)| 0b00010000; 
+	
+		I2C_ITR &= ~1;
+    I2C_ITR |= 6;
+
+    I2C_CR1 &= 192;
+    I2C_CR1 |= 1;
+
+    I2C_CR2 &= 128;
+    I2C_CR2 |= 4;
+
+    I2C_OARH = 0b01000000 | (I2C_OARH & 0b00111001);
+    I2C_OARL = 0b01010000 | (I2C_OARL & 1);
+
+    CLK_PCKENR1 |= 1;
+
+}

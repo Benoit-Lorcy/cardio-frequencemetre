@@ -24,8 +24,6 @@ main()
 {
 	//definition des variables
 	uint8_t i = 0;
-	uint16_t ac_cap = 0;
-	uint16_t dc_cap = 0;
 	uint16_t temp_PUIS = PUIS;
 	
 	//redefiniton des variables globales
@@ -35,6 +33,7 @@ main()
 	CLK_CKDIVR&=0b11100000;
 	
 	//initialisation des foncitons
+	init_I2C_Slave();
 	init_SPI();
 	init_TFT();
 	init_ADC();
@@ -46,7 +45,7 @@ main()
 	affiche_mot(Simu, 45, 5);
 	affiche_mot(Bpm, 1, 25);
 	affiche_mot(Puis, 1, 45);
-	affiche_mot(Demo, 10, 65);
+	affiche_mot(Ops, 10, 65);
 	
 	affiche_nombre(BPM, 90, 25);
 	affiche_nombre(PUIS, 90, 45);
@@ -65,6 +64,7 @@ main()
 		if(mod_MODE){
 			mod_MODE = 0; 
 			MODE = MODE ^ 1;
+			init_I2C_Slave();
 			if(!MODE){
 				affiche_mot(Demo,10,65);
 			}
@@ -99,5 +99,7 @@ main()
 			PUIS = (read_ADC_8b()*100)/255;
 			affiche_nombre(PUIS,90,45);
 		}
+		affiche_nombre(dc_cap,10,45);
+		affiche_nombre(ac_cap,10,65);
 	}
 }
