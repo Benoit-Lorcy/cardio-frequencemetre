@@ -10,6 +10,8 @@ extern volatile uint16_t int_2ms_ok;
 extern volatile uint8_t led_poul_counter;
 extern volatile uint16_t cpt_ech;
 
+extern volatile uint8_t MODE;
+extern volatile uint8_t Selection_couleur; // 0 = Fond, 1 = Text, 2 = Valeurs
 
 typedef void @far (*interrupt_handler_t)(void);
 
@@ -28,23 +30,43 @@ struct interrupt_vector {
 
 @far @interrupt void int_PE5(void)
 {
-	sal_bas += 2;
-	if(sal_bas > 60) {
-		sal_bas = 40;
+	if(MODE == 0) {
+		sal_bas += 2;
+		if(sal_bas > 60) {
+			sal_bas = 40;
+		}
+		
+		affiche_nombre(sal_bas, 90, 70);
+	} else {
+		
 	}
-	
-	affiche_nombre(sal_bas, 90, 70);
+	return;
+}
+
+extern void init_ecran_defaut(void);
+extern void init_ecran_couleurs(void);
+
+@far @interrupt void int_PC4 (void) {
+	if(MODE == 0) {
+		init_ecran_couleurs();
+	} else {
+		init_ecran_defaut();
+	}
 	return;
 }
 
 @far @interrupt void int_PD3 (void)
 {
-	sal_haut -= 10;
-	if(sal_haut < 100) {
-		sal_haut = 240;
+	if(MODE == 0) {
+		sal_haut -= 10;
+		if(sal_haut < 100) {
+			sal_haut = 240;
+		}
+		
+		affiche_nombre(sal_haut, 90, 100);
+	} else {
+		
 	}
-	
-	affiche_nombre(sal_haut, 90, 100);
 	return;
 }
 
@@ -76,7 +98,7 @@ struct interrupt_vector const _vectab[] = {
 	{0x82, NonHandledInterrupt}, /* irq2  */
 	{0x82, NonHandledInterrupt}, /* irq3  */
 	{0x82, NonHandledInterrupt}, /* irq4  */
-	{0x82, NonHandledInterrupt}, /* irq5  */
+	{0x82, int_PC4}, /* irq5  */
 	{0x82, int_PD3}, /* irq6  */
 	{0x82, int_PE5}, /* irq7  */
 	{0x82, NonHandledInterrupt}, /* irq8  */

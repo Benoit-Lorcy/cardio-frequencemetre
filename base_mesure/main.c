@@ -21,6 +21,32 @@ void send_dc_cap_UART(uint16_t cap) {
 	write_byte_UART2(((cap >> 0) & 0x0F) | 0xA0);
 }
 
+void init_ecran_defaut(void) {
+	MODE = 0;
+	
+	fillScreen_TFT(ST7735_BLACK);
+	
+	affiche_mot(Mesure, 28, 5);
+	affiche_mot(Bpm, 1, 40);
+	affiche_mot(Seuil_bas, 1, 70);
+	affiche_mot(Seuil_haut, 1, 100);
+	affiche_mot(Puis, 1, 130);
+	
+	affiche_nombre(sal_bas, 90, 70);
+	affiche_nombre(sal_haut, 90, 100);
+	affiche_nombre(BPM, 90, 40);
+}
+
+void init_ecran_couleurs(void) {
+	MODE = 1;
+	
+	fillScreen_TFT(ST7735_BLACK);
+
+	affiche_mot(Fond, 1, 10);
+	affiche_mot(Texte, 1, 40);
+	affiche_mot(Valeurs, 1, 70);
+}
+
 main()
 {
 	uint8_t old_adc_drh = 0;
@@ -40,17 +66,11 @@ main()
 	
 	init_I2C();
 	
-	fillScreen_TFT(ST7735_BLACK);
+	couleur_fond = ST7735_BLACK;
+	couleur_texte = ST7735_RED;
+	couleur_valeurs = ST7735_YELLOW;
 	
-	affiche_mot(Mesure, 28, 5);
-	affiche_mot(Bpm, 1, 40);
-	affiche_mot(Seuil_bas, 1, 70);
-	affiche_mot(Seuil_haut, 1, 100);
-	affiche_mot(Puis, 1, 130);
-	
-	affiche_nombre(sal_bas, 90, 70);
-	affiche_nombre(sal_haut, 90, 100);
-	affiche_nombre(BPM, 90, 40);
+	init_ecran_defaut();
 	
 	ADC_CR1 |= 1;
 	EnableGeneralInterrupt();
@@ -80,19 +100,15 @@ main()
 			cpt_ech++;
 			
 			ac_cap = read_AD7991(0b00011000);
-			//affiche_nombre(ac_cap, 0, 0);
 			dc_cap = read_AD7991(0b00101000);
 			
-			//affiche_nombre(dc_cap, 0, 30);
-			
-			if(cpt_ech > 900) {
+			if(cpt_ech == 0 > 1500) { // 20bpm cutoff
 				cpt_ech = 0;
 				affiche_nombre(888, 90, 40);
-				etat = 0;
+
 			} else {
 				machine_etat();
 			}
-			
 			send_ac_cap_UART(2000);
 			send_dc_cap_UART(1000);
 		}

@@ -21,6 +21,10 @@ static const uint8_t Texte[]="Texte:";
 static const uint8_t Fond[]="Fond:";
 static const uint8_t Valeurs[]="Valeurs:";
 
+volatile uint16_t couleur_texte;
+volatile uint16_t couleur_fond;
+volatile uint16_t couleur_valeurs;
+
 //divers
 volatile uint8_t sal_bas = 40;
 volatile uint8_t sal_haut = 240;
@@ -35,6 +39,9 @@ volatile uint16_t ac_cap = 2000;
 volatile uint16_t dc_cap = 1000;
 volatile uint8_t etat = 1;
 volatile uint8_t led_poul_counter = 0;
+
+volatile uint8_t MODE = 0; // 0 = Normal, 1 = selection couleurs
+volatile uint8_t Selection_couleur; // 0 = Fond, 1 = Text, 2 = Valeurs
 
 const int8_t tab_ech[1000] = {
 0,
