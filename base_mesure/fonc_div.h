@@ -27,3 +27,5 @@ void machine_etat(void);
 //control_f
 
 
+void init_I2C(void);
+uint16_t read_AD7991(uint8_t octet_conf);

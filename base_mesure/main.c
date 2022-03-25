@@ -7,39 +7,7 @@
  
 #include "fonc_div.h"
 #include "defs.h"
-#include "fonc_I2C.h"
 #include "fonc_delay.h"
-
-
-void init_PWM(void) {
-	
-}
-
-void init_I2C(void) {
-	//Init_I2C();
-}
-
-uint16_t read_AD7991(uint8_t octet_conf) {
-	uint16_t data;
-	
-	Start_I2C();
-	Write_I2C(0b01010000);
-	Write_I2C(octet_conf);
-	Stop_I2C();
-	
-	Start_I2C();
-	Write_I2C(0b01010001);
-	
-	Ack_I2C();
-	data = Read_I2C() << 8;
-	
-	NoAck_I2C();
-	data |= Read_I2C();
-	
-	Stop_I2C();
-	
-	return data;
-}
 
 void send_ac_cap_UART(uint16_t cap) {
 	write_byte_UART2((cap >> 8) & 0x0F);
@@ -59,7 +27,6 @@ main()
 	uint16_t calc_ccr = 0;
 	
 	CLK_CKDIVR &= 0b11100000;
-	BPM = 50;
 	
 	init_SPI();
 	init_TFT();
@@ -70,6 +37,8 @@ main()
 	init_timer1_2ms();
 	init_timer2_pwm();
 	init_UART2(57600);
+	
+	init_I2C();
 	
 	fillScreen_TFT(ST7735_BLACK);
 	
@@ -109,13 +78,20 @@ main()
 		if(int_2ms_ok == 1) {
 			int_2ms_ok = 0;
 			cpt_ech++;
-			ech = (ech + k) % 1000;
 			
-			ac_cap = 2048 + tab_ech[ech];
+			ac_cap = read_AD7991(0b00011000);
+			//affiche_nombre(ac_cap, 0, 0);
+			dc_cap = read_AD7991(0b00101000);
 			
-			machine_etat();
+			//affiche_nombre(dc_cap, 0, 30);
 			
-			affiche_nombre(BPM, 90, 40);
+			if(cpt_ech > 900) {
+				cpt_ech = 0;
+				affiche_nombre(888, 90, 40);
+				etat = 0;
+			} else {
+				machine_etat();
+			}
 			
 			send_ac_cap_UART(2000);
 			send_dc_cap_UART(1000);

@@ -29,7 +29,6 @@ volatile uint8_t PUIS = 30;
 volatile uint16_t int_2ms_ok = 0;
 volatile uint8_t k = 4;
 volatile uint16_t cpt_ech = 0;
-volatile uint16_t ech = 0;
 volatile uint16_t tab_cpt[8] = {428,428,428,428,428,428,428,428};
 
 volatile uint16_t ac_cap = 2000;

@@ -8,6 +8,8 @@ extern volatile uint8_t sal_haut;
 extern volatile uint16_t int_2ms_ok;
 
 extern volatile uint8_t led_poul_counter;
+extern volatile uint16_t cpt_ech;
+
 
 typedef void @far (*interrupt_handler_t)(void);
 
@@ -48,6 +50,10 @@ struct interrupt_vector {
 
 @far @interrupt void int_timer1_2ms (void)
 {
+	if(int_2ms_ok == 1) {
+			TIM1_SR1 &= ~1;
+		return;
+	}
 	int_2ms_ok = 1;
 	
 	if(led_poul_counter > 0) {

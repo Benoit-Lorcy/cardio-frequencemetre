@@ -4,6 +4,7 @@
 *******************************************************************************/
 
 #include "fonc_div.h"
+#include "fonc_I2C.h"
 
 extern volatile uint16_t cpt_ech;
 extern volatile uint16_t tab_cpt[8];
@@ -139,6 +140,7 @@ void init_timer2_pwm(void) {
 
 void machine_etat(void) {
 	uint16_t cmpt_moyenne = 0;
+	uint8_t i = 0;
 	switch(etat) {
 		case 1:
 			if(ac_cap > 2148) {
@@ -161,7 +163,12 @@ void machine_etat(void) {
 		case 4:
 			if(ac_cap < 1948) {
 				etat=3;
-				cmpt_moyenne = (cpt_ech + tab_cpt[0] + tab_cpt[1] + tab_cpt[2] + tab_cpt[3] + tab_cpt[4] + tab_cpt[5] + tab_cpt[6] + tab_cpt[7]) / 9;
+				cmpt_moyenne = cpt_ech;
+				for(i = 0; i < 7; i++) {
+					cmpt_moyenne += tab_cpt[i];
+				}
+				cmpt_moyenne = cmpt_moyenne / 8;
+				BPM = (30000) / (cmpt_moyenne);
 				tab_cpt[7] = tab_cpt[6];
 				tab_cpt[6] = tab_cpt[5];
 				tab_cpt[5] = tab_cpt[4];
@@ -172,9 +179,39 @@ void machine_etat(void) {
 				
 				tab_cpt[0] = cpt_ech;
 				cpt_ech = 0;
-				BPM = (60 * 1000) / (cmpt_moyenne * 2);
+				
+				affiche_nombre(BPM, 90, 40);
+
+				
 			}
 			break;
 		default: etat = 1;
 	}
+}
+
+void init_I2C(void) {
+	Init_I2C_Master();
+}
+
+uint16_t read_AD7991(uint8_t octet_conf) {
+	uint16_t data;
+	
+	Start_I2C();
+
+	Write_I2C(0b01010000);
+	Write_I2C(octet_conf);
+	Stop_I2C();
+	
+	Start_I2C();
+	Write_I2C(0b01010001);
+	
+	Ack_I2C();
+	data = Read_I2C() << 8;
+	
+	NoAck_I2C();
+	data |= Read_I2C();
+	
+	Stop_I2C();
+	
+	return data;
 }
