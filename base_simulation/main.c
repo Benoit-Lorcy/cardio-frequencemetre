@@ -8,7 +8,7 @@
 //#include <iostm8s105.h>
 #include "fonc_div.h"
 #include "defs.h"
-
+volatile uint8_t cmpt_ech = 0;
 /*
 // Init PWM connection for PUIS
 void init_pwm(void) {
@@ -20,10 +20,12 @@ void init_I2C(void) {
 	
 }
 */
+void machine_etat(void);
+
 main()
 {
 	//definition des variables
-	uint8_t i = 0;
+	
 	uint16_t temp_PUIS = PUIS;
 	
 	//redefiniton des variables globales
@@ -40,6 +42,7 @@ main()
 	init_PD4();
 	init_timer3();
 	init_Poussoirs();
+	init_timer1_2ms();
 	
 	// initialisation de l'affichage
 	affiche_mot(Simu, 45, 5);
@@ -65,11 +68,15 @@ main()
 			mod_MODE = 0; 
 			MODE = MODE ^ 1;
 			init_I2C_Slave();
+			
+			//mode demo
 			if(!MODE){
 				affiche_mot(Demo,10,65);
 			}
+			//mode op
 			else
 			{
+				ac_cap = 2048;
 				affiche_mot(Ops,10,65);
 				fillRect_TFT(0, 80, 128, 80, ST7735_BLACK);
 			}
@@ -91,15 +98,28 @@ main()
 		
 		//si mode DEMO => on affiche la courbe
 		if(!MODE){
-			ac_cap = (tab_ech[(k*i*4)%1000]<<(PUIS>>4)>>3)/32;
-			drawVLine_TFT(i, 120-40, 80, ST7735_BLACK);
-			drawVLine_TFT(i, 120 - ac_cap, 5, ST7735_YELLOW);
-			i = (i+1)%128;
+			//ac_cap = (tab_ech[(k*i*4)%1000]<<(PUIS>>4)>>3)/32;
+			drawVLine_TFT(cmpt_ech, 120-40, 80, ST7735_BLACK);
+			drawVLine_TFT(cmpt_ech, 120 - ((tab_ech[(k*cmpt_ech*4)%1000]<<(PUIS>>4))>>3)/32, 5, ST7735_YELLOW);
 			
 			PUIS = (read_ADC_8b()*100)/255;
 			affiche_nombre(PUIS,90,45);
+			cmpt_ech = (cmpt_ech+1) % 128;
+		} 
+		
+		//a chaque interrutpion du timer1
+		if(int_2ms_ok){
+			int_2ms_ok  = 0;
+			
+			if(MODE){
+				ac_cap = 2048 + ((tab_ech[(k*cmpt_ech)%1000]<<(PUIS>>4))>>3);
+					cmpt_ech = (cmpt_ech+1)%128;
+			}
+							ac_cap = 2048 + tab_ech[(k*cmpt_ech)%1000];
+
+			dc_cap = 1600+(PUIS <<3);
 		}
-		affiche_nombre(dc_cap,10,45);
-		affiche_nombre(ac_cap,10,65);
+		//affiche_nombre(dc_cap,10,45);
+		//affiche_nombre(ac_cap,10,65);
 	}
 }

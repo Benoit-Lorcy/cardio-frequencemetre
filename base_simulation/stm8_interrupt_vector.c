@@ -9,10 +9,11 @@ extern volatile uint8_t mod_MODE;
 extern volatile uint16_t PUIS;
 extern volatile uint16_t ac_cap;
 extern volatile uint16_t dc_cap;
-volatile uint8_t etat = 0;
+extern volatile uint8_t int_2ms_ok;
+volatile uint8_t bit_to_transmit = 0;
 volatile uint8_t demande = 0;
 
-
+extern volatile uint8_t cmpt_ech;
 typedef void @far (*interrupt_handler_t)(void);
 
 struct interrupt_vector {
@@ -47,73 +48,78 @@ struct interrupt_vector {
 
 @far @interrupt void Int_I2C(void) {
     uint8_t sr1;
-    uint8_t sr3 = I2C_SR2;
-		
-	if(I2C_SR2 & 7) {
-		I2C_CR1 &= ~1;
-		return;
-	}
-    switch(etat) // Premiere connexion, demande de lecture de ViN0/Vin1
-    {
-    case 0: // Nouvelle connexion
-        sr1 = I2C_SR1;
-        sr3 = I2C_SR3;
-        // ADDR mit a 0 automatiquement
-        if((sr1 & 0x2) && (sr3 & 0x2)) { // Toujours vraie
-            if(sr3 & 0x4) {
-                etat = 3; // Ecriture
-            } else {
-                etat = 1; // Lecture instruction
-            }
-        }
-        break;
-    case 1:
-        sr1 = I2C_DR; // RxNE mit a 0 automatiquement
+    uint8_t sr3;
+    uint8_t dr;
 
-        if(sr1 == 0b00011000) {
+    if(I2C_SR2 & 0x04) { // No Ack
+        I2C_SR2 &= ~0x04;    
+    }
+
+    if(I2C_SR2 & 7) { // Check line disconnected/errors, disable I2C
+        I2C_CR1 &= ~1;
+        return;
+    }
+
+    sr1 = I2C_SR1;
+    sr3 = I2C_SR3;
+
+    if( sr1 & (1 << 4) ) { // Stop detection, STOPF bit
+        // Il faut ecrire dans CR2 pour gerer STOPF
+        I2C_CR2 |= (1 << 7); // Bit SWRST: Software Reset
+    }
+
+    // Bit start + bonne addresse
+    if( (sr1 & 0x2) && (sr3 & 0x2) ) {
+        // Simplement lire sr1 et sr3 est suffisant pour valide cette etape
+        return;
+    }
+
+    // Recoit-on de l'information (bit RxNE)
+    if( sr1 & (1 << 6) ) {
+        dr = I2C_DR;
+
+        if(dr == 0b00011000) {
             demande = 0; // VIN0
-        } else if(sr1 == 0b00101000) {
+        } else if(dr == 0b00101000) {
             demande = 1; // VIN1
         }
-        etat = 0; // STOP
-        break;
-    case 2:
-        sr1 = I2C_SR1;
-
-        if(sr1 & 0x10) {
-            etat = 0;
-        }
-        break;
-    case 3:
-        sr1 = I2C_SR1;
-
-        if(sr1 & 0x80) {
-            if(demande == 0) {
-                I2C_DR = ac_cap & 0xFF;
-            } else if(demande == 1) {
-                I2C_DR = dc_cap & 0xFF;
-            }
-            etat = 4;
-        }
-        break;
-    case 4:
-					sr1 = I2C_SR1;
-        if(sr1 & 0x80) {
-            if(demande == 0) {
-                I2C_DR = (ac_cap >> 8) & 0xFF;
-            } else if(demande == 1) {
-                I2C_DR = (dc_cap >> 8)& 0xFF;
-            }
-            etat = 5; // No Ack
-        }
-        break;
-    case 5:
-        etat = 0;
-        I2C_SR2 &= ~4;
-    default:
-			break;
-		}
+        return;
+    }
 		
+		
+
+    // Doit-on fournir de l'information (bit TxE)
+    if ( (sr1 & (1 << 7)) ) {
+			if (demande == 0) {
+            if(bit_to_transmit == 0) {
+                I2C_DR = (ac_cap >> 8) & 0xFF;
+                bit_to_transmit = 1;
+            } else if(bit_to_transmit == 1){
+                I2C_DR = ac_cap & 0xFF;
+                bit_to_transmit = 2;
+            } else {
+							I2C_DR = 0;
+							bit_to_transmit = 0;
+						}
+        } else {
+            if(bit_to_transmit == 0) {
+                I2C_DR = (dc_cap >> 8) & 0xFF;
+                bit_to_transmit = 1;
+            } else if(bit_to_transmit == 1){
+                I2C_DR = dc_cap & 0xFF;
+                bit_to_transmit = 2;
+            } else {
+							I2C_DR = 0;
+							bit_to_transmit = 0;
+						}
+        }
+    }
+}
+
+
+@far @interrupt void int_timer1_2ms(void) {
+	int_2ms_ok = 1;
+	TIM1_SR1 &= ~1;
 }
 
 extern void _stext();     /* startup routine */
@@ -132,7 +138,7 @@ struct interrupt_vector const _vectab[] = {
 	{0x82, NonHandledInterrupt}, /* irq8  */
 	{0x82, NonHandledInterrupt}, /* irq9  */
 	{0x82, NonHandledInterrupt}, /* irq10 */
-	{0x82, NonHandledInterrupt}, /* irq11 */
+	{0x82, int_timer1_2ms}, /* irq11 */
 	{0x82, NonHandledInterrupt}, /* irq12 */
 	{0x82, NonHandledInterrupt}, /* irq13 */
 	{0x82, NonHandledInterrupt}, /* irq14 */

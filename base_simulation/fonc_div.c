@@ -122,3 +122,16 @@ void init_I2C_Slave(void) {
     CLK_PCKENR1 |= 1;
 
 }
+
+void init_timer1_2ms(void){
+		CLK_PCKENR1 |= 1 << 7;
+		
+		TIM1_PSCRH = 999 / 256;
+		TIM1_PSCRL = 999 % 256;
+		TIM1_ARRH = 31 / 256;
+		TIM1_ARRL = 31 % 256;
+		TIM1_CR1 = 0;
+		TIM1_IER |= 1;
+		TIM1_SR1 = 0;
+		TIM1_CR1 |= 1;
+}
