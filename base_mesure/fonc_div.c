@@ -15,6 +15,10 @@ extern volatile uint8_t etat;
 extern volatile uint8_t led_poul_counter;
 extern volatile uint8_t BPM;
 
+extern volatile uint16_t couleur_texte;
+extern volatile uint16_t couleur_fond;
+extern volatile uint16_t couleur_valeurs;
+
 void init_SPI(void) {
 	CLK_PCKENR1 |= 1 << 1;
 		
@@ -34,7 +38,7 @@ void init_SPI(void) {
 
 void affiche_mot(uint8_t* mot, uint8_t col, uint8_t ligne) {
 	while(*mot) {
-		displayChar_TFT(col, ligne, *mot, ST7735_RED,ST7735_BLACK, 2);
+		displayChar_TFT(col, ligne, *mot, couleur_texte,couleur_fond, 2);
 		col += 11;
 		mot++;
 	}
@@ -42,9 +46,9 @@ void affiche_mot(uint8_t* mot, uint8_t col, uint8_t ligne) {
 
 void affiche_nombre(uint16_t nombre, uint8_t col, uint8_t ligne) {
 	if(nombre < 1000) {
-		displayChar_TFT(col, ligne, '0'+(nombre/100), ST7735_YELLOW, ST7735_BLACK, 2);
-		displayChar_TFT(col+11, ligne, '0'+((nombre%100)/10), ST7735_YELLOW, ST7735_BLACK, 2);
-		displayChar_TFT(col+11*2, ligne, '0'+(nombre%10), ST7735_YELLOW, ST7735_BLACK, 2);
+		displayChar_TFT(col, ligne, '0'+(nombre/100), couleur_valeurs, couleur_fond, 2);
+		displayChar_TFT(col+11, ligne, '0'+((nombre%100)/10), couleur_valeurs, couleur_fond, 2);
+		displayChar_TFT(col+11*2, ligne, '0'+(nombre%10), couleur_valeurs, couleur_fond, 2);
 	}
 }
 
@@ -75,6 +79,7 @@ void init_Poussoirs(void) {
 	
 	EXTI_CR1 |= (1<<6)|(1<<4);
 	EXTI_CR1 &= 0b01011111;
+	EXTI_CR1 |= (1<<7);
 	
 	EXTI_CR2 |= 1;
 	EXTI_CR2 &= ~2;
